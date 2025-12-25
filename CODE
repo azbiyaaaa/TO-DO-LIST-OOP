@@ -1,0 +1,180 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+/* ================= USER CLASS ================= */
+class User {
+public:
+bool registerUser() {
+string username, password;
+cout << "\nEnter new username: ";
+getline(cin, username);
+cout << "Enter new password: ";
+getline(cin, password);
+
+ofstream file("users.txt", ios::app);
+file << username << " " << password << endl;
+file.close();
+
+cout << "Registration successful!\n";
+return true;
+}
+
+bool loginUser() {
+string username, password, u, p;
+cout << "\nEnter username: ";
+getline(cin, username);
+cout << "Enter password: ";
+getline(cin, password);
+
+ifstream file("users.txt");
+while (file >> u >> p) {
+if (u == username && p == password) {
+file.close();
+cout << "Login successful!\n";
+return true;
+}
+}
+file.close();
+
+cout << "Invalid username or password!\n";
+return false;
+}
+};
+
+/* ================= TO-DO LIST CLASS ================= */
+class ToDoList {
+private:
+string filename;
+
+public:
+ToDoList() {
+filename = "tasks.txt";
+}
+
+void addTask() {
+string task;
+cout << "Enter task: ";
+getline(cin, task);
+
+ofstream file(filename, ios::app);
+file << task << " | Pending\n";
+file.close();
+
+cout << "Task added!\n";
+}
+
+void viewTasks() {
+ifstream file(filename);
+string line;
+int i = 1;
+
+cout << "\nTask List:\n";
+while (getline(file, line)) {
+cout << i++ << ". " << line << endl;
+}
+
+if (i == 1)
+cout << "No tasks found!\n";
+
+file.close();
+}
+
+void deleteTask() {
+ifstream file(filename);
+string tasks[100];
+int count = 0;
+
+while (getline(file, tasks[count])) {
+count++;
+}
+file.close();
+
+int num;
+cout << "Enter task number to delete: ";
+cin >> num;
+cin.ignore();
+
+ofstream out(filename);
+for (int i = 0; i < count; i++) {
+if (i != num - 1)
+out << tasks[i] << endl;
+}
+out.close();
+
+cout << "Task deleted!\n";
+}
+
+void markCompleted() {
+ifstream file(filename);
+string tasks[100];
+int count = 0;
+
+while (getline(file, tasks[count])) {
+count++;
+}
+file.close();
+
+int num;
+cout << "Enter task number to mark completed: ";
+cin >> num;
+cin.ignore();
+
+ofstream out(filename);
+for (int i = 0; i < count; i++) {
+if (i == num - 1)
+out << tasks[i].substr(0, tasks[i].find("|"))
+<< "| Completed\n";
+else
+out << tasks[i] << endl;
+}
+out.close();
+
+cout << "Task marked as completed!\n";
+}
+};
+
+/* ================= MAIN ================= */
+int main() {
+User user;
+ToDoList todo;
+int choice;
+bool loggedIn = false;
+
+cout << "===== LOGIN SYSTEM =====\n";
+cout << "1. Register\n2. Login\nEnter choice: ";
+cin >> choice;
+cin.ignore();
+
+if (choice == 1)
+user.registerUser();
+
+loggedIn = user.loginUser();
+
+if (!loggedIn)
+return 0;
+
+do {
+cout << "\n===== TO-DO LIST MENU =====\n";
+cout << "1. Add Task\n";
+cout << "2. View Tasks\n";
+cout << "3. Delete Task\n";
+cout << "4. Mark Task Completed\n";
+cout << "5. Exit\n";
+cout << "Enter choice: ";
+cin >> choice;
+cin.ignore();
+
+switch (choice) {
+case 1: todo.addTask(); break;
+case 2: todo.viewTasks(); break;
+case 3: todo.deleteTask(); break;
+case 4: todo.markCompleted(); break;
+case 5: cout << "Goodbye!\n"; break;
+default: cout << "Invalid choice!\n";
+}
+} while (choice != 5);
+
+return 0;
+}
